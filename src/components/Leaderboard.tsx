@@ -1,108 +1,125 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import GameContext from "./GameContext";
-import {
-  getLeaderboard,
-  saveToLeaderboard,
-  qualifiesForLeaderboard,
-  LeaderboardEntry,
-} from "@/data/potholes";
+import { LeaderboardEntry } from "@/data/potholes";
 
 export default function Leaderboard() {
   const { score, restart } = useContext(GameContext);
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [initials, setInitials] = useState(["", "", ""]);
   const [saved, setSaved] = useState(false);
-  const [qualifies, setQualifies] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [justSavedIdx, setJustSavedIdx] = useState<number | null>(null);
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
   ];
 
+  // Fetch leaderboard from API
   useEffect(() => {
-    const lb = getLeaderboard();
-    setBoard(lb);
-    setQualifies(score !== null && qualifiesForLeaderboard(score));
-  }, [score]);
+    fetch("/api/leaderboard")
+      .then((r) => r.json())
+      .then((data) => {
+        setBoard(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  useEffect(() => {
-    if (qualifies && inputRefs[0].current) {
-      inputRefs[0].current.focus();
-    }
-  }, [qualifies]);
+  const qualifies =
+    score !== null && (board.length < 10 || score > (board[9]?.score ?? 0));
 
-  function handleInitialChange(index: number, value: string) {
-    const char = value.toUpperCase().replace(/[^A-Z]/g, "").slice(-1);
-    const newInitials = [...initials];
-    newInitials[index] = char;
-    setInitials(newInitials);
-
-    if (char && index < 2 && inputRefs[index + 1].current) {
-      inputRefs[index + 1].current!.focus();
+  function handleInitialChange(idx: number, val: string) {
+    const char = val.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(-1);
+    const next = [...initials];
+    next[idx] = char;
+    setInitials(next);
+    if (char && idx < 2) {
+      inputRefs[idx + 1].current?.focus();
     }
   }
 
-  function handleKeyDown(index: number, e: React.KeyboardEvent) {
-    if (e.key === "Backspace" && !initials[index] && index > 0) {
-      inputRefs[index - 1].current!.focus();
+  function handleKeyDown(idx: number, e: React.KeyboardEvent) {
+    if (e.key === "Backspace" && !initials[idx] && idx > 0) {
+      inputRefs[idx - 1].current?.focus();
     }
   }
 
-  function submitScore() {
-    if (initials.some((c) => !c) || score === null || saved) return;
+  async function handleSave() {
+    if (score === null || initials.some((c) => !c)) return;
     const entry: LeaderboardEntry = {
       initials: initials.join(""),
       score,
-      date: new Date().toLocaleDateString(),
+      date: new Date().toISOString().split("T")[0],
     };
-    const newBoard = saveToLeaderboard(entry);
-    setBoard(newBoard);
-    setSaved(true);
-  }
 
-  const medals = ["🥇", "🥈", "🥉"];
+    try {
+      const res = await fetch("/api/leaderboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+      });
+      const updatedBoard = await res.json();
+      setBoard(updatedBoard);
+      const idx = updatedBoard.findIndex(
+        (e: LeaderboardEntry) =>
+          e.initials === entry.initials &&
+          e.score === entry.score &&
+          e.date === entry.date
+      );
+      setJustSavedIdx(idx >= 0 ? idx : null);
+      setSaved(true);
+    } catch {
+      // Fallback: just show it locally
+      const newBoard = [...board, entry]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+      setBoard(newBoard);
+      setSaved(true);
+    }
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
       className="leaderboard"
     >
       <h2 className="leaderboard__title">
-        <i className="fa-solid fa-trophy"></i> TOP SCORES
+        <i className="fa-solid fa-trophy"></i> Hall of Champions
       </h2>
 
-      {/* Initial entry */}
+      {/* Entry form */}
       {qualifies && !saved && (
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="leaderboard__entry"
         >
-          <p className="leaderboard__entry-label">
-            🎉 You made the top 10! Enter your initials:
-          </p>
+          <div className="leaderboard__entry-label">
+            ⚔️ You scored {score?.toLocaleString()}! Enter your initials:
+          </div>
           <div className="leaderboard__initials-row">
-            {[0, 1, 2].map((i) => (
+            {initials.map((ch, i) => (
               <input
                 key={i}
                 ref={inputRefs[i]}
+                className="leaderboard__initial-input"
                 type="text"
                 maxLength={1}
-                value={initials[i]}
+                value={ch}
                 onChange={(e) => handleInitialChange(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className="leaderboard__initial-input"
+                autoFocus={i === 0}
               />
             ))}
             <button
-              onClick={submitScore}
-              disabled={initials.some((c) => !c)}
               className="leaderboard__submit-btn"
+              onClick={handleSave}
+              disabled={initials.some((c) => !c)}
             >
-              SAVE
+              INSCRIBE
             </button>
           </div>
         </motion.div>
@@ -110,15 +127,15 @@ export default function Leaderboard() {
 
       {saved && (
         <motion.div
-          initial={{ scale: 1.3, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
           className="leaderboard__saved-msg"
         >
-          ✅ Score saved!
+          ⚔️ Your name has been inscribed!
         </motion.div>
       )}
 
-      {/* Score table */}
+      {/* Scoreboard */}
       <div className="leaderboard__table">
         <div className="leaderboard__header">
           <span>#</span>
@@ -126,40 +143,44 @@ export default function Leaderboard() {
           <span>SCORE</span>
           <span>DATE</span>
         </div>
-        <AnimatePresence>
-          {board.length === 0 && (
-            <div className="leaderboard__empty">No scores yet — be the first!</div>
-          )}
-          {board.map((entry, idx) => (
+
+        {loading ? (
+          <div className="leaderboard__empty">Loading scores...</div>
+        ) : board.length === 0 ? (
+          <div className="leaderboard__empty">
+            No champions yet. Be the first!
+          </div>
+        ) : (
+          board.map((entry, i) => (
             <motion.div
-              key={entry.initials + entry.date + idx}
-              initial={{ opacity: 0, x: -20 }}
+              key={`${entry.initials}-${entry.score}-${i}`}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.08 }}
-              className={`leaderboard__row ${idx < 3 ? "leaderboard__row--top" : ""} ${
-                saved && entry.initials === initials.join("") && entry.score === score
-                  ? "leaderboard__row--highlight"
-                  : ""
-              }`}
+              transition={{ delay: i * 0.06 }}
+              className={`leaderboard__row ${
+                i < 3 ? "leaderboard__row--top" : ""
+              } ${justSavedIdx === i ? "leaderboard__row--highlight" : ""}`}
             >
               <span className="leaderboard__rank">
-                {idx < 3 ? medals[idx] : idx + 1}
+                {i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
               </span>
               <span className="leaderboard__name">{entry.initials}</span>
-              <span className="leaderboard__score">{entry.score.toLocaleString()}</span>
+              <span className="leaderboard__score">
+                {entry.score.toLocaleString()}
+              </span>
               <span className="leaderboard__date">{entry.date}</span>
             </motion.div>
-          ))}
-        </AnimatePresence>
+          ))
+        )}
       </div>
 
       <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
         onClick={restart}
         className="leaderboard__play-again"
       >
-        <i className="fa-solid fa-rotate-right"></i> PLAY AGAIN
+        <i className="fa-solid fa-redo"></i> Play Again
       </motion.button>
     </motion.div>
   );

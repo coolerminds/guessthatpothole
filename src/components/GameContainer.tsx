@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import GameContext, { GamePhase } from "./GameContext";
-import { getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
+import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
 import PotholeViewer from "./PotholeViewer";
 import ScoreDisplay from "./ScoreDisplay";
 import Leaderboard from "./Leaderboard";
+import PastPotholes from "./PastPotholes";
 
 const FresnoMap = dynamic(() => import("./FresnoMap"), { ssr: false });
 
@@ -14,8 +15,10 @@ export default function GameContainer() {
   const [guessPos, setGuessPos] = useState<[number, number] | null>(null);
   const [score, setScore] = useState<number | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
+  const [activePothole, setActivePothole] = useState<Pothole | null>(null);
 
-  const todaysPothole = useMemo(() => getDailyPothole(), []);
+  const dailyPothole = useMemo(() => getDailyPothole(), []);
+  const todaysPothole = activePothole || dailyPothole;
 
   // Determine daily pothole number
   const dayNumber = useMemo(() => {
@@ -24,6 +27,23 @@ export default function GameContainer() {
     const diff = now.getTime() - start.getTime();
     return Math.floor(diff / (1000 * 60 * 60 * 24));
   }, []);
+
+  // Listen for past pothole play events
+  const handlePlayPast = useCallback(() => {
+    if (window.__pastPothole) {
+      setActivePothole(window.__pastPothole);
+      setGuessPos(null);
+      setScore(null);
+      setDistance(null);
+      setPhase("PLAYING");
+      window.__pastPothole = undefined;
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("play-past-pothole", handlePlayPast);
+    return () => window.removeEventListener("play-past-pothole", handlePlayPast);
+  }, [handlePlayPast]);
 
   function handleGuess() {
     if (!guessPos) return;
@@ -44,6 +64,7 @@ export default function GameContainer() {
   }
 
   function restart() {
+    setActivePothole(null); // reset to daily
     setGuessPos(null);
     setScore(null);
     setDistance(null);
@@ -152,7 +173,9 @@ export default function GameContainer() {
               >
                 <div className="game__playing-info">
                   <i className="fa-solid fa-circle-info"></i>
-                  Come on down... and click on the map!
+                  {activePothole
+                    ? `Playing past pothole from ${activePothole.date}`
+                    : "Come on down... and click on the map!"}
                 </div>
                 <div className="game__playing-split">
                   <PotholeViewer />
@@ -200,6 +223,9 @@ export default function GameContainer() {
                 className="game__leaderboard"
               >
                 <Leaderboard />
+
+                {/* Past Potholes */}
+                <PastPotholes />
 
                 {/* Submit Pothole — Coming Soon */}
                 <motion.div
