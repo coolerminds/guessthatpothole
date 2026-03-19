@@ -15,6 +15,7 @@ export interface GameContextType {
   setDistance: (dist: number | null) => void;
   handleGuess: () => void;
   restart: () => void;
+  isPastPlay: boolean; // true when playing a past pothole (no ranking)
 }
 
 const GameContext = createContext<GameContextType>({} as GameContextType);

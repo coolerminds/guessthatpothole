@@ -4,7 +4,7 @@ import GameContext from "./GameContext";
 import { LeaderboardEntry } from "@/data/potholes";
 
 export default function Leaderboard() {
-  const { score, restart } = useContext(GameContext);
+  const { score, restart, todaysPothole, isPastPlay } = useContext(GameContext);
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [initials, setInitials] = useState(["", "", ""]);
   const [saved, setSaved] = useState(false);
@@ -16,19 +16,23 @@ export default function Leaderboard() {
     useRef<HTMLInputElement>(null),
   ];
 
-  // Fetch leaderboard from API
+  const potholeDate = todaysPothole.date;
+
+  // Fetch leaderboard for this specific pothole
   useEffect(() => {
-    fetch("/api/leaderboard")
+    fetch(`/api/leaderboard?date=${potholeDate}`)
       .then((r) => r.json())
       .then((data) => {
         setBoard(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [potholeDate]);
 
   const qualifies =
-    score !== null && (board.length < 10 || score > (board[9]?.score ?? 0));
+    !isPastPlay &&
+    score !== null &&
+    (board.length < 10 || score > (board[9]?.score ?? 0));
 
   function handleInitialChange(idx: number, val: string) {
     const char = val.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(-1);
@@ -47,8 +51,9 @@ export default function Leaderboard() {
   }
 
   async function handleSave() {
-    if (score === null || initials.some((c) => !c)) return;
-    const entry: LeaderboardEntry = {
+    if (score === null || initials.some((c) => !c) || isPastPlay) return;
+    const entry = {
+      potholeDate,
       initials: initials.join(""),
       score,
       date: new Date().toISOString().split("T")[0],
@@ -65,17 +70,11 @@ export default function Leaderboard() {
       const idx = updatedBoard.findIndex(
         (e: LeaderboardEntry) =>
           e.initials === entry.initials &&
-          e.score === entry.score &&
-          e.date === entry.date
+          e.score === entry.score
       );
       setJustSavedIdx(idx >= 0 ? idx : null);
       setSaved(true);
     } catch {
-      // Fallback: just show it locally
-      const newBoard = [...board, entry]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10);
-      setBoard(newBoard);
       setSaved(true);
     }
   }
@@ -89,8 +88,12 @@ export default function Leaderboard() {
       <h2 className="leaderboard__title">
         <i className="fa-solid fa-trophy"></i> Hall of Champions
       </h2>
+      <div className="leaderboard__pothole-date">
+        <i className="fa-solid fa-calendar"></i> {potholeDate}
+        {isPastPlay && <span className="leaderboard__past-badge">PAST QUEST</span>}
+      </div>
 
-      {/* Entry form */}
+      {/* Entry form — only for today's pothole */}
       {qualifies && !saved && (
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -135,6 +138,13 @@ export default function Leaderboard() {
         </motion.div>
       )}
 
+      {/* Past play notice */}
+      {isPastPlay && score !== null && (
+        <div className="leaderboard__past-notice">
+          You scored {score.toLocaleString()} on this past quest! Scores are not ranked for past potholes.
+        </div>
+      )}
+
       {/* Scoreboard */}
       <div className="leaderboard__table">
         <div className="leaderboard__header">
@@ -148,7 +158,7 @@ export default function Leaderboard() {
           <div className="leaderboard__empty">Loading scores...</div>
         ) : board.length === 0 ? (
           <div className="leaderboard__empty">
-            No champions yet. Be the first!
+            No champions yet for this pothole.
           </div>
         ) : (
           board.map((entry, i) => (

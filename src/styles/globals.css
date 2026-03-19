@@ -558,6 +558,40 @@ body {
   text-align: center;
 }
 
+.leaderboard__pothole-date {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--gold);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.leaderboard__past-badge {
+  background: rgba(192, 162, 96, 0.15);
+  color: var(--gold-light);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(192, 162, 96, 0.3);
+  margin-left: 6px;
+}
+
+.leaderboard__past-notice {
+  text-align: center;
+  background: var(--parchment);
+  border: 1px solid rgba(192, 162, 96, 0.15);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 .leaderboard__entry-label {
   color: var(--emerald-glow);
   font-weight: 600;

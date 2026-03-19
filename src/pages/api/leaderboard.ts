@@ -2,25 +2,31 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { readLeaderboard, writeLeaderboard } from "@/lib/db";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  // GET /api/leaderboard?date=2026-03-18
   if (req.method === "GET") {
-    const board = readLeaderboard();
+    const potholeDate = (req.query.date as string) || new Date().toISOString().split("T")[0];
+    const board = readLeaderboard(potholeDate);
     return res.status(200).json(board);
   }
 
+  // POST /api/leaderboard  { potholeDate, initials, score, date }
   if (req.method === "POST") {
-    const { initials, score, date } = req.body;
+    const { potholeDate, initials, score, date } = req.body;
 
     if (
+      !potholeDate ||
       !initials ||
       typeof initials !== "string" ||
       initials.length !== 3 ||
       typeof score !== "number" ||
       !date
     ) {
-      return res.status(400).json({ error: "Invalid entry. Need: initials (3 chars), score (number), date." });
+      return res.status(400).json({
+        error: "Need: potholeDate, initials (3 chars), score (number), date.",
+      });
     }
 
-    const board = writeLeaderboard({
+    const board = writeLeaderboard(potholeDate, {
       initials: initials.toUpperCase(),
       score,
       date,

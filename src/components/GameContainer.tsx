@@ -71,6 +71,8 @@ export default function GameContainer() {
     setPhase("PLAYING");
   }
 
+  const isPastPlay = activePothole !== null;
+
   const contextValue = {
     phase,
     setPhase,
@@ -83,6 +85,7 @@ export default function GameContainer() {
     setDistance,
     handleGuess,
     restart,
+    isPastPlay,
   };
 
   return (
