@@ -1,0 +1,814 @@
+/* ===================================================
+   GUESS THAT POTHOLE — Medieval / Fantasy RPG Theme
+   =================================================== */
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+@font-face {
+  font-family: 'MedievalSharp';
+  src: url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+}
+
+:root {
+  --gold: #c0a260;
+  --gold-light: #e0c290;
+  --gold-dark: #8a6d30;
+  --emerald: #38a169;
+  --emerald-glow: #68d391;
+  --red: #c53030;
+  --dark-bg: #1a1714;
+  --dark-card: #252019;
+  --dark-surface: #2d2820;
+  --parchment: #3a3228;
+  --parchment-light: #4a4038;
+  --text: #d4c9a8;
+  --text-bright: #f0e6c8;
+  --text-muted: #8a7e68;
+  --font-display: 'MedievalSharp', 'Luckiest Guy', cursive;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --radius: 8px;
+  --border-gold: 2px solid var(--gold);
+  --glow-gold: 0 0 15px rgba(192, 162, 96, 0.3);
+  --glow-emerald: 0 0 12px rgba(56, 161, 105, 0.35);
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  background: var(--dark-bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(192, 162, 96, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(56, 161, 105, 0.03) 0%, transparent 40%),
+    var(--dark-bg);
+}
+
+#__next { height: 100%; }
+
+/* ---------- Game Shell ---------- */
+.game {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.game__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: linear-gradient(180deg, var(--dark-card) 0%, var(--dark-surface) 100%);
+  border-bottom: var(--border-gold);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(192, 162, 96, 0.15);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.game__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.game__logo-icon {
+  font-size: 1.6rem;
+  display: inline-block;
+}
+
+.game__title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  color: var(--text-bright);
+  text-shadow: 1px 2px 3px rgba(0,0,0,0.7);
+}
+
+.game__title--accent {
+  color: var(--gold-light);
+  text-shadow: 0 0 8px rgba(192, 162, 96, 0.4), 1px 2px 3px rgba(0,0,0,0.7);
+}
+
+.game__daily-badge {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--dark-bg);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 5px 14px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--gold-light);
+  box-shadow: var(--glow-gold);
+}
+
+.game__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.game__footer {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--dark-card);
+  border-top: 1px solid rgba(192, 162, 96, 0.15);
+  flex-shrink: 0;
+}
+
+/* ---------- INTRO Screen ---------- */
+.game__intro {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(192, 162, 96, 0.06) 0%, transparent 60%);
+}
+
+.game__intro-card {
+  background: var(--dark-card);
+  border: var(--border-gold);
+  border-radius: var(--radius);
+  padding: 44px 40px;
+  max-width: 520px;
+  text-align: center;
+  box-shadow: var(--glow-gold), 0 16px 50px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+.game__intro-card::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(192, 162, 96, 0.1);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.game__intro-emoji {
+  font-size: 2.8rem;
+  margin-bottom: 12px;
+}
+
+.game__intro-heading {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--gold-light);
+  margin-bottom: 4px;
+  text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+}
+
+.game__intro-subheading {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--emerald);
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.game__intro-desc {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.game__intro-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.game__intro-rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--parchment);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  border-left: 3px solid var(--gold);
+}
+
+.game__intro-rule i {
+  color: var(--gold);
+  font-size: 1rem;
+  width: 22px;
+  text-align: center;
+}
+
+.game__play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+  color: var(--dark-bg);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  padding: 12px 32px;
+  border: 2px solid var(--gold-light);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: var(--glow-gold), 0 4px 12px rgba(0,0,0,0.4);
+  transition: box-shadow 0.3s, transform 0.15s;
+}
+
+.game__play-btn:hover {
+  box-shadow: 0 0 25px rgba(192, 162, 96, 0.5), 0 4px 16px rgba(0,0,0,0.5);
+}
+
+/* ---------- PLAYING Layout ---------- */
+.game__playing, .game__scored {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game__playing-info {
+  background: var(--parchment);
+  border-bottom: 1px solid rgba(192, 162, 96, 0.2);
+  padding: 8px 20px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gold-light);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.game__playing-split, .game__scored-split {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .game__playing-split, .game__scored-split {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .game__playing-info {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+  }
+}
+
+/* ---------- Pothole Viewer ---------- */
+.pothole-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-card);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pothole-viewer__badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--dark-bg);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  padding: 5px 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  border: 1px solid var(--gold-light);
+  box-shadow: var(--glow-gold);
+}
+
+.pothole-viewer__frame {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 60vh;
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 20px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.3);
+  background: #0a0a08;
+}
+
+.pothole-viewer__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.pothole-viewer__hint {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--parchment);
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--emerald-glow);
+  border: 1px solid rgba(56, 161, 105, 0.25);
+}
+
+/* ---------- Fresno Map ---------- */
+.fresno-map {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--dark-surface);
+  border-left: var(--border-gold);
+}
+
+@media (max-width: 768px) {
+  .fresno-map {
+    border-left: none;
+    border-top: var(--border-gold);
+  }
+}
+
+.fresno-map__container {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+}
+
+.fresno-map__leaflet {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.fresno-map__guess-wrapper {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.fresno-map__guess-btn {
+  pointer-events: auto;
+  padding: 10px 24px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  background: rgba(37, 32, 25, 0.85);
+  color: var(--text-muted);
+  backdrop-filter: blur(4px);
+}
+
+.fresno-map__guess-btn--active {
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+  color: var(--dark-bg);
+  border-color: var(--gold-light);
+  box-shadow: var(--glow-gold);
+  cursor: pointer;
+}
+
+.fresno-map__guess-btn--active:hover {
+  box-shadow: 0 0 25px rgba(192, 162, 96, 0.5);
+}
+
+.fresno-map__guess-btn:disabled {
+  cursor: not-allowed;
+}
+
+/* ---------- Score Display ---------- */
+.score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-card);
+  padding: 28px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.score-display__confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.score-display__confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.score-display__emoji {
+  font-size: 3.5rem;
+  margin-bottom: 8px;
+}
+
+.score-display__label {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+  text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+  margin-bottom: 10px;
+}
+
+.score-display__score {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  text-shadow: 2px 3px 4px rgba(0,0,0,0.6);
+  line-height: 1;
+  margin-bottom: 14px;
+}
+
+.score-display__max {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+}
+
+.score-display__distance {
+  font-size: 0.95rem;
+  color: var(--emerald-glow);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- Scored Actions ---------- */
+.game__scored-actions {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  flex-shrink: 0;
+  background: var(--dark-card);
+  border-top: 1px solid rgba(192, 162, 96, 0.1);
+}
+
+.game__continue-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(180deg, var(--emerald), #2d8555);
+  color: var(--text-bright);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  padding: 12px 28px;
+  border: 2px solid var(--emerald-glow);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: var(--glow-emerald);
+  transition: box-shadow 0.3s;
+}
+
+.game__continue-btn:hover {
+  box-shadow: 0 0 22px rgba(56, 161, 105, 0.5);
+}
+
+.game__scored {
+  padding-bottom: 0;
+}
+
+.game__leaderboard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+/* ---------- Leaderboard ---------- */
+.leaderboard {
+  background: var(--dark-card);
+  border: var(--border-gold);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--glow-gold), 0 16px 50px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.leaderboard::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(192, 162, 96, 0.08);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.leaderboard__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--gold-light);
+  text-align: center;
+  margin-bottom: 18px;
+  text-shadow: 1px 2px 3px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.leaderboard__entry {
+  background: var(--parchment);
+  border: 1px solid rgba(56, 161, 105, 0.3);
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.leaderboard__entry-label {
+  color: var(--emerald-glow);
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.leaderboard__initials-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.leaderboard__initial-input {
+  width: 46px;
+  height: 54px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--gold-light);
+  background: var(--dark-bg);
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  outline: none;
+  text-transform: uppercase;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.leaderboard__initial-input:focus {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 10px rgba(192, 162, 96, 0.35);
+}
+
+.leaderboard__submit-btn {
+  background: linear-gradient(180deg, var(--emerald), #2d8555);
+  color: var(--text-bright);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  padding: 10px 18px;
+  border: 1px solid var(--emerald-glow);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+}
+
+.leaderboard__submit-btn:hover {
+  box-shadow: 0 0 12px rgba(56, 161, 105, 0.4);
+}
+
+.leaderboard__submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.leaderboard__saved-msg {
+  text-align: center;
+  color: var(--emerald-glow);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.leaderboard__table {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.leaderboard__header {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+  border-bottom: 1px solid rgba(192, 162, 96, 0.15);
+}
+
+.leaderboard__empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 18px;
+  font-size: 0.85rem;
+}
+
+.leaderboard__row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.leaderboard__row:hover {
+  background: rgba(192, 162, 96, 0.05);
+}
+
+.leaderboard__row--top {
+  background: rgba(192, 162, 96, 0.06);
+  border-left: 2px solid var(--gold);
+}
+
+.leaderboard__row--highlight {
+  background: rgba(56, 161, 105, 0.1);
+  border: 1px solid rgba(56, 161, 105, 0.25);
+}
+
+.leaderboard__rank {
+  text-align: center;
+  font-weight: 700;
+}
+
+.leaderboard__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+}
+
+.leaderboard__score {
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.leaderboard__date {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.leaderboard__play-again {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+  color: var(--dark-bg);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  padding: 12px;
+  border: 2px solid var(--gold-light);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: var(--glow-gold);
+  transition: box-shadow 0.3s;
+}
+
+.leaderboard__play-again:hover {
+  box-shadow: 0 0 22px rgba(192, 162, 96, 0.5);
+}
+
+/* ---------- Submit Pothole (Coming Soon) ---------- */
+.game__submit-pothole {
+  background: var(--dark-card);
+  border: 2px dashed rgba(192, 162, 96, 0.2);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  position: relative;
+  opacity: 0.85;
+}
+
+.game__submit-pothole-badge {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold-dark);
+  color: var(--text-bright);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  padding: 3px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--gold);
+}
+
+.game__submit-pothole-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--gold-light);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.game__submit-pothole-desc {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.game__submit-pothole-btn {
+  background: rgba(192, 162, 96, 0.1);
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  padding: 8px 20px;
+  border: 1px solid rgba(192, 162, 96, 0.2);
+  border-radius: 6px;
+  cursor: not-allowed;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Leaflet Overrides ---------- */
+.leaflet-container {
+  background: var(--dark-surface) !important;
+}
+
+/* Dark-toned map tiles: muted by default, vibrant on interaction */
+.fresno-map .leaflet-tile-pane {
+  filter: brightness(0.55) saturate(0.35) contrast(1.1) sepia(0.15);
+  transition: filter 0.6s ease;
+}
+
+.fresno-map:hover .leaflet-tile-pane,
+.fresno-map--active .leaflet-tile-pane {
+  filter: brightness(0.8) saturate(0.7) contrast(1.05) sepia(0.08);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .game__header { padding: 8px 14px; }
+  .game__title { font-size: 1rem; }
+  .game__daily-badge { font-size: 0.68rem; padding: 3px 10px; }
+  .game__intro-card { padding: 24px 18px; }
+  .game__intro-heading { font-size: 1.4rem; }
+  .score-display__score { font-size: 2.6rem; }
+  .score-display__label { font-size: 1.3rem; }
+  .leaderboard { padding: 18px 14px; }
+  .game__submit-pothole { padding: 20px 14px; }
+}
+
+/* ---------- Scrollbar Styling ---------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark-bg); }
+::-webkit-scrollbar-thumb { background: var(--parchment); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
