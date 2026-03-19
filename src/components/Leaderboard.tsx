@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import GameContext from "./GameContext";
 import { LeaderboardEntry } from "@/data/potholes";
+import { getFresnoDateString } from "@/lib/date";
 
 export default function Leaderboard() {
   const { score, todaysPothole, isPastPlay } = useContext(GameContext);
@@ -10,6 +11,7 @@ export default function Leaderboard() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [justSavedIdx, setJustSavedIdx] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState("");
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
@@ -57,11 +59,14 @@ export default function Leaderboard() {
 
   async function handleSave() {
     if (score === null || initials.some((c) => !c) || isPastPlay) return;
+
+    setSaveError("");
+
     const entry = {
       potholeDate,
       initials: initials.join(""),
       score,
-      date: new Date().toISOString().split("T")[0],
+      date: getFresnoDateString(),
     };
 
     try {
@@ -70,6 +75,12 @@ export default function Leaderboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(entry),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Unable to save your score right now.");
+      }
+
       const updatedBoard = await res.json();
       setBoard(updatedBoard);
       const idx = updatedBoard.findIndex(
@@ -78,8 +89,10 @@ export default function Leaderboard() {
       );
       setJustSavedIdx(idx >= 0 ? idx : null);
       setSaved(true);
-    } catch {
-      setSaved(true);
+    } catch (error) {
+      setSaveError(
+        error instanceof Error ? error.message : "Unable to save your score right now."
+      );
     }
   }
 
@@ -93,12 +106,18 @@ export default function Leaderboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Something went wrong. Try again!");
+      }
+
       const data = await res.json();
       setSubStatus("done");
       setSubMsg(data.alreadySubscribed ? "You're already subscribed!" : "You're in! 🎉");
-    } catch {
+    } catch (error) {
       setSubStatus("error");
-      setSubMsg("Something went wrong. Try again!");
+      setSubMsg(error instanceof Error ? error.message : "Something went wrong. Try again!");
     }
   }
 
@@ -161,6 +180,10 @@ export default function Leaderboard() {
         >
           ⚔️ Your name has been inscribed!
         </motion.div>
+      )}
+
+      {saveError && (
+        <div className="leaderboard__subscribe-error">{saveError}</div>
       )}
 
       {/* Past play notice */}

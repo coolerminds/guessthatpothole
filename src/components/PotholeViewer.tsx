@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import GameContext from "./GameContext";
 
 export default function PotholeViewer() {
@@ -17,11 +18,13 @@ export default function PotholeViewer() {
         <span>IDENTIFY THIS POTHOLE</span>
       </div>
       <div className="pothole-viewer__frame">
-        <img
+        <Image
           src={todaysPothole.image}
           alt={`Pothole ${todaysPothole.id}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="pothole-viewer__img"
-          draggable={false}
+          priority
         />
       </div>
       {todaysPothole.hint && (

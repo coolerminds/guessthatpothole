@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getFresnoDateString } from "@/lib/date";
 import { readLeaderboard, writeLeaderboard } from "@/lib/db";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   // GET /api/leaderboard?date=2026-03-18
   if (req.method === "GET") {
-    const potholeDate = (req.query.date as string) || new Date().toISOString().split("T")[0];
+    const potholeDate = (req.query.date as string) || getFresnoDateString();
     const board = readLeaderboard(potholeDate);
     return res.status(200).json(board);
   }

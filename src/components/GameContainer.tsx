@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import GameContext, { GamePhase } from "./GameContext";
 import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
+import { getFresnoDayOfYear } from "@/lib/date";
 import PotholeViewer from "./PotholeViewer";
 import ScoreDisplay from "./ScoreDisplay";
 import Leaderboard from "./Leaderboard";
@@ -22,10 +23,7 @@ export default function GameContainer() {
 
   // Determine daily pothole number
   const dayNumber = useMemo(() => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), 0, 0);
-    const diff = now.getTime() - start.getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+    return getFresnoDayOfYear();
   }, []);
 
   // Listen for past pothole play events

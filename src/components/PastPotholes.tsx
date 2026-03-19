@@ -1,10 +1,10 @@
 import { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Pothole } from "@/data/potholes";
 import GameContext from "./GameContext";
 
 export default function PastPotholes() {
-  const { setPhase } = useContext(GameContext);
   const [pastPotholes, setPastPotholes] = useState<Pothole[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +60,13 @@ export default function PastPotholes() {
             className="past-potholes__card"
           >
             <div className="past-potholes__thumb">
-              <img src={pothole.image} alt={`Pothole ${pothole.id}`} />
+              <Image
+                src={pothole.image}
+                alt={`Pothole ${pothole.id}`}
+                fill
+                sizes="56px"
+                className="past-potholes__thumb-img"
+              />
             </div>
             <div className="past-potholes__info">
               <span className="past-potholes__date">

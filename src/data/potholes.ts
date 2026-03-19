@@ -1,3 +1,5 @@
+import { getFresnoDateString, getFresnoDayOfYear } from "@/lib/date";
+
 export interface Pothole {
   id: string;
   image: string;
@@ -94,21 +96,18 @@ export const potholes: Pothole[] = [
 
 // Get today's daily pothole
 export function getDailyPothole(): Pothole {
-  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  const today = getFresnoDateString();
   // Try to find a pothole scheduled for today
   const scheduled = potholes.find((p) => p.date === today);
   if (scheduled) return scheduled;
-  // Fallback: cycle through by day-of-year
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - start.getTime();
-  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return potholes[dayOfYear % potholes.length];
+  // Fallback: cycle through Fresno's day-of-year so the daily roll-over matches Fresno time.
+  const dayOfYear = getFresnoDayOfYear();
+  return potholes[(dayOfYear - 1) % potholes.length];
 }
 
 // Get past potholes (dates before today)
 export function getPastPotholes(): Pothole[] {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getFresnoDateString();
   return potholes.filter((p) => p.date < today);
 }
 
