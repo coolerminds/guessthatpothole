@@ -728,27 +728,118 @@ body {
   font-size: 0.78rem;
 }
 
-.leaderboard__play-again {
+.leaderboard__comeback {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
-  color: var(--dark-bg);
+  background: var(--parchment);
+  color: var(--gold-light);
   font-family: var(--font-display);
-  font-size: 1rem;
-  letter-spacing: 1px;
-  padding: 12px;
-  border: 2px solid var(--gold-light);
+  font-size: 0.95rem;
+  padding: 14px;
+  border: 1px solid rgba(192, 162, 96, 0.15);
   border-radius: 6px;
-  cursor: pointer;
-  box-shadow: var(--glow-gold);
-  transition: box-shadow 0.3s;
+  text-align: center;
+  margin-bottom: 16px;
 }
 
-.leaderboard__play-again:hover {
-  box-shadow: 0 0 22px rgba(192, 162, 96, 0.5);
+.leaderboard__comeback i {
+  color: var(--gold);
+  font-size: 1.1rem;
+}
+
+/* ---------- Email Subscribe ---------- */
+.leaderboard__subscribe {
+  background: var(--parchment);
+  border: 1px solid rgba(56, 161, 105, 0.2);
+  border-radius: 6px;
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.leaderboard__subscribe-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+.leaderboard__subscribe-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--emerald-glow);
+  margin-bottom: 4px;
+}
+
+.leaderboard__subscribe-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.leaderboard__subscribe-form {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.leaderboard__subscribe-input {
+  flex: 1;
+  max-width: 220px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  background: var(--dark-bg);
+  color: var(--text-bright);
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  outline: none;
+  font-family: var(--font-body);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.leaderboard__subscribe-input:focus {
+  border-color: var(--emerald);
+  box-shadow: 0 0 8px rgba(56, 161, 105, 0.3);
+}
+
+.leaderboard__subscribe-input::placeholder {
+  color: var(--text-muted);
+}
+
+.leaderboard__subscribe-btn {
+  padding: 8px 16px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  background: linear-gradient(180deg, var(--emerald), #2d8555);
+  color: var(--text-bright);
+  border: 1px solid var(--emerald-glow);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.leaderboard__subscribe-btn:hover {
+  box-shadow: var(--glow-emerald);
+}
+
+.leaderboard__subscribe-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.leaderboard__subscribe-success {
+  color: var(--emerald-glow);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 4px;
+}
+
+.leaderboard__subscribe-error {
+  color: var(--red);
+  font-size: 0.8rem;
+  margin-top: 6px;
 }
 
 /* ---------- Submit Pothole (Coming Soon) ---------- */

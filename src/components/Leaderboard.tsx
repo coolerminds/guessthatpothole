@@ -4,7 +4,7 @@ import GameContext from "./GameContext";
 import { LeaderboardEntry } from "@/data/potholes";
 
 export default function Leaderboard() {
-  const { score, restart, todaysPothole, isPastPlay } = useContext(GameContext);
+  const { score, todaysPothole, isPastPlay } = useContext(GameContext);
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [initials, setInitials] = useState(["", "", ""]);
   const [saved, setSaved] = useState(false);
@@ -15,6 +15,11 @@ export default function Leaderboard() {
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
   ];
+
+  // Email subscribe
+  const [email, setEmail] = useState("");
+  const [subStatus, setSubStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [subMsg, setSubMsg] = useState("");
 
   const potholeDate = todaysPothole.date;
 
@@ -69,13 +74,31 @@ export default function Leaderboard() {
       setBoard(updatedBoard);
       const idx = updatedBoard.findIndex(
         (e: LeaderboardEntry) =>
-          e.initials === entry.initials &&
-          e.score === entry.score
+          e.initials === entry.initials && e.score === entry.score
       );
       setJustSavedIdx(idx >= 0 ? idx : null);
       setSaved(true);
     } catch {
       setSaved(true);
+    }
+  }
+
+  async function handleSubscribe(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !email.includes("@")) return;
+    setSubStatus("sending");
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      setSubStatus("done");
+      setSubMsg(data.alreadySubscribed ? "You're already subscribed!" : "You're in! 🎉");
+    } catch {
+      setSubStatus("error");
+      setSubMsg("Something went wrong. Try again!");
     }
   }
 
@@ -90,7 +113,9 @@ export default function Leaderboard() {
       </h2>
       <div className="leaderboard__pothole-date">
         <i className="fa-solid fa-calendar"></i> {potholeDate}
-        {isPastPlay && <span className="leaderboard__past-badge">PAST QUEST</span>}
+        {isPastPlay && (
+          <span className="leaderboard__past-badge">PAST QUEST</span>
+        )}
       </div>
 
       {/* Entry form — only for today's pothole */}
@@ -141,7 +166,8 @@ export default function Leaderboard() {
       {/* Past play notice */}
       {isPastPlay && score !== null && (
         <div className="leaderboard__past-notice">
-          You scored {score.toLocaleString()} on this past quest! Scores are not ranked for past potholes.
+          You scored {score.toLocaleString()} on this past quest! Scores are not
+          ranked for past potholes.
         </div>
       )}
 
@@ -184,14 +210,56 @@ export default function Leaderboard() {
         )}
       </div>
 
-      <motion.button
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={restart}
-        className="leaderboard__play-again"
+      {/* Come back tomorrow — for today's pothole */}
+      {!isPastPlay && (
+        <div className="leaderboard__comeback">
+          <i className="fa-solid fa-hourglass-half"></i>
+          <span>Come back tomorrow for the new pothole quest!</span>
+        </div>
+      )}
+
+      {/* Email Newsletter Subscribe */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="leaderboard__subscribe"
       >
-        <i className="fa-solid fa-redo"></i> Play Again
-      </motion.button>
+        <div className="leaderboard__subscribe-icon">📬</div>
+        <h3 className="leaderboard__subscribe-title">
+          Never Miss a Pothole!
+        </h3>
+        <p className="leaderboard__subscribe-desc">
+          Get notified when the new daily pothole quest drops.
+        </p>
+        {subStatus === "done" ? (
+          <div className="leaderboard__subscribe-success">{subMsg}</div>
+        ) : (
+          <form
+            className="leaderboard__subscribe-form"
+            onSubmit={handleSubscribe}
+          >
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="leaderboard__subscribe-input"
+              required
+            />
+            <button
+              type="submit"
+              className="leaderboard__subscribe-btn"
+              disabled={subStatus === "sending"}
+            >
+              {subStatus === "sending" ? "..." : "SUBSCRIBE"}
+            </button>
+          </form>
+        )}
+        {subStatus === "error" && (
+          <div className="leaderboard__subscribe-error">{subMsg}</div>
+        )}
+      </motion.div>
     </motion.div>
   );
 }
