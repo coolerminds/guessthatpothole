@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import GameContext, { GamePhase } from "./GameContext";
 import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
 import { getFresnoDisplayDate } from "@/lib/date";
@@ -196,8 +197,14 @@ export default function GameContainer() {
               GUESS THAT <span className="game__title--accent">POTHOLE</span>
             </h1>
           </div>
-          <div className="game__daily-badge">
-            <i className="fa-solid fa-calendar-day"></i>The Pothole for {dailyLabel}
+          <div className="game__header-actions">
+            <Link href="/history" className="game__history-link">
+              <i className="fa-solid fa-bookmark"></i>
+              <span>My History</span>
+            </Link>
+            <div className="game__daily-badge">
+              <i className="fa-solid fa-calendar-day"></i>The Pothole for {dailyLabel}
+            </div>
           </div>
         </header>
 

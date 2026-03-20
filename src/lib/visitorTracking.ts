@@ -42,6 +42,27 @@ export interface VisitorRecord {
 
 type VisitorDB = Record<string, VisitorRecord>;
 
+export interface PublicHistoryEntry {
+  type: "submitted_guess";
+  at: string;
+  potholeId: string;
+  potholeDate: string;
+  isPastPlay: boolean;
+  score: number | null;
+  distanceMiles: number | null;
+  guessLat: number | null;
+  guessLng: number | null;
+}
+
+export interface PublicVisitorHistory {
+  visitorId: string;
+  firstVisitedAt: string;
+  lastVisitedAt: string;
+  lastPotholeDate: string;
+  guessCount: number;
+  entries: PublicHistoryEntry[];
+}
+
 function ensureDb() {
   const dir = path.dirname(DB_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -128,4 +149,54 @@ export function writeVisitorEvent(
   writeAll(db);
 
   return record;
+}
+
+export function getVisitorRecord(visitorId: string): VisitorRecord | null {
+  const db = readAll();
+  return db[visitorId] || null;
+}
+
+export function getPublicVisitorHistory(
+  visitorId: string
+): PublicVisitorHistory | null {
+  const record = getVisitorRecord(visitorId);
+
+  if (!record) return null;
+
+  const entries: PublicHistoryEntry[] = record.events
+    .filter((event) => event.type === "submitted_guess")
+    .map((event) => ({
+      type: "submitted_guess",
+      at: event.at,
+      potholeId: event.potholeId,
+      potholeDate: event.potholeDate,
+      isPastPlay: event.isPastPlay,
+      score: event.score ?? null,
+      distanceMiles: event.distanceMiles ?? null,
+      guessLat: event.guessLat ?? null,
+      guessLng: event.guessLng ?? null,
+    }))
+    .sort((a, b) => (a.at < b.at ? 1 : -1));
+
+  return {
+    visitorId: record.visitorId,
+    firstVisitedAt: record.firstVisitedAt,
+    lastVisitedAt: record.lastVisitedAt,
+    lastPotholeDate: record.lastPotholeDate,
+    guessCount: entries.length,
+    entries,
+  };
+}
+
+export function readCookieValue(cookieHeader: string | undefined, name: string) {
+  if (!cookieHeader) return null;
+
+  const cookie = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`));
+
+  if (!cookie) return null;
+
+  return decodeURIComponent(cookie.slice(name.length + 1));
 }
