@@ -42,8 +42,12 @@ function createVisitorId() {
   return `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+export function getVisitorId(): string | null {
+  return readCookie(VISITOR_COOKIE_NAME);
+}
+
 export function getOrCreateVisitorId(): string {
-  const existing = readCookie(VISITOR_COOKIE_NAME);
+  const existing = getVisitorId();
   if (existing) return existing;
 
   const visitorId = createVisitorId();

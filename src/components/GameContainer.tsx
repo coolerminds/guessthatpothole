@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import GameContext, { GamePhase } from "./GameContext";
 import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
 import { getFresnoDayOfYear } from "@/lib/date";
-import { getOrCreateVisitorId, trackVisitorEvent } from "@/lib/visitorClient";
+import { getOrCreateVisitorId, getVisitorId, trackVisitorEvent } from "@/lib/visitorClient";
 import PotholeViewer from "./PotholeViewer";
 import ScoreDisplay from "./ScoreDisplay";
 import Leaderboard from "./Leaderboard";
@@ -18,6 +18,7 @@ export default function GameContainer() {
   const [score, setScore] = useState<number | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
   const [activePothole, setActivePothole] = useState<Pothole | null>(null);
+  const [isReturningVisitor, setIsReturningVisitor] = useState(false);
   const visitorIdRef = useRef<string | null>(null);
   const startedKeysRef = useRef<Set<string>>(new Set());
   const placedGuessKeysRef = useRef<Set<string>>(new Set());
@@ -51,6 +52,8 @@ export default function GameContainer() {
   }, [handlePlayPast]);
 
   useEffect(() => {
+    const existingVisitorId = getVisitorId();
+    setIsReturningVisitor(Boolean(existingVisitorId));
     visitorIdRef.current = getOrCreateVisitorId();
 
     void trackVisitorEvent({
@@ -221,6 +224,12 @@ export default function GameContainer() {
                   <h2 className="game__intro-heading">
                     Guess That Pothole!
                   </h2>
+                  {isReturningVisitor && (
+                    <div className="game__intro-welcome">
+                      <i className="fa-solid fa-road"></i>
+                      <span>Welcome back. Ready for another pothole hunt?</span>
+                    </div>
+                  )}
                   <p className="game__intro-subheading">Pothole of the Day</p>
                   <p className="game__intro-desc">
                     You&apos;ll be shown a photo of a real pothole from{" "}
@@ -241,15 +250,26 @@ export default function GameContainer() {
                       <span>Score up to 5,000 points</span>
                     </div>
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setPhase("PLAYING")}
-                    className="game__play-btn"
-                  >
-                    <span>COME ON DOWN!</span>
-                    <i className="fa-solid fa-arrow-right"></i>
-                  </motion.button>
+                  <div className="game__intro-actions">
+                    <motion.button
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setPhase("PLAYING")}
+                      className="game__play-btn"
+                    >
+                      <span>Lets Play</span>
+                      <i className="fa-solid fa-arrow-right"></i>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={goToLeaderboard}
+                      className="game__intro-secondary-btn"
+                    >
+                      <i className="fa-solid fa-trophy"></i>
+                      <span>VIEW SCOREBOARD</span>
+                    </motion.button>
+                  </div>
                 </motion.div>
               </motion.div>
             )}
@@ -299,7 +319,7 @@ export default function GameContainer() {
                     onClick={goToLeaderboard}
                     className="game__continue-btn"
                   >
-                    SHOW ME THE LEADERBOARD! <i className="fa-solid fa-arrow-right"></i>
+                    SHOW ME THE LEADERBOARD <i className="fa-solid fa-arrow-right"></i>
                   </motion.button>
                 </div>
               </motion.div>
@@ -332,7 +352,7 @@ export default function GameContainer() {
                   </h3>
                   <p className="game__submit-pothole-desc">
                     Soon you&apos;ll be able to submit your own pothole photos and
-                    coordinates to be featured as a Pothole of the Day!
+                    coordinates to be featured as a Pothole of the Day
                   </p>
                   <button className="game__submit-pothole-btn" disabled>
                     <i className="fa-solid fa-upload"></i> Submit a Pothole

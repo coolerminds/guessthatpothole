@@ -169,6 +169,20 @@ body {
   text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
 }
 
+.game__intro-welcome {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(56, 161, 105, 0.12);
+  border: 1px solid rgba(104, 211, 145, 0.3);
+  color: var(--emerald-glow);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .game__intro-subheading {
   font-family: var(--font-display);
   font-size: 0.95rem;
@@ -229,6 +243,38 @@ body {
 
 .game__play-btn:hover {
   box-shadow: 0 0 25px rgba(192, 162, 96, 0.5), 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.game__intro-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.game__intro-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 250px;
+  background: rgba(58, 50, 40, 0.9);
+  color: var(--text-bright);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  padding: 10px 22px;
+  border: 1px solid rgba(224, 194, 144, 0.45);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 12px rgba(0,0,0,0.35);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.game__intro-secondary-btn:hover {
+  background: rgba(74, 64, 56, 0.98);
+  border-color: var(--gold-light);
+  box-shadow: 0 0 18px rgba(192, 162, 96, 0.2), 0 4px 12px rgba(0,0,0,0.35);
 }
 
 /* ---------- PLAYING Layout ---------- */
