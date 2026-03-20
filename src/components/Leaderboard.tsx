@@ -4,6 +4,15 @@ import GameContext from "./GameContext";
 import { LeaderboardEntry } from "@/data/potholes";
 import { getFresnoDateString } from "@/lib/date";
 
+function formatRankLabel(index: number) {
+  const rank = index + 1;
+  if (rank % 100 >= 11 && rank % 100 <= 13) return `${rank}TH`;
+  if (rank % 10 === 1) return `${rank}ST`;
+  if (rank % 10 === 2) return `${rank}ND`;
+  if (rank % 10 === 3) return `${rank}RD`;
+  return `${rank}TH`;
+}
+
 export default function Leaderboard() {
   const { score, todaysPothole, isPastPlay } = useContext(GameContext);
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
@@ -127,8 +136,9 @@ export default function Leaderboard() {
       animate={{ opacity: 1, y: 0 }}
       className="leaderboard"
     >
+      <div className="leaderboard__kicker">Live standings</div>
       <h2 className="leaderboard__title">
-        <i className="fa-solid fa-trophy"></i> Today&apos;s Hall of Champions
+        Today&apos;s Hall of Champions
       </h2>
       <div className="leaderboard__pothole-date">
         <i className="fa-solid fa-calendar"></i> {potholeDate}
@@ -221,7 +231,7 @@ export default function Leaderboard() {
               } ${justSavedIdx === i ? "leaderboard__row--highlight" : ""}`}
             >
               <span className="leaderboard__rank">
-                {i === 0 ? "👑" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                {formatRankLabel(i)}
               </span>
               <span className="leaderboard__name">{entry.initials}</span>
               <span className="leaderboard__score">
