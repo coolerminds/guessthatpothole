@@ -1,9 +1,10 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import GameContext, { GamePhase } from "./GameContext";
 import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
 import { getFresnoDayOfYear } from "@/lib/date";
+import { getOrCreateVisitorId, trackVisitorEvent } from "@/lib/visitorClient";
 import PotholeViewer from "./PotholeViewer";
 import ScoreDisplay from "./ScoreDisplay";
 import Leaderboard from "./Leaderboard";
@@ -17,9 +18,15 @@ export default function GameContainer() {
   const [score, setScore] = useState<number | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
   const [activePothole, setActivePothole] = useState<Pothole | null>(null);
+  const visitorIdRef = useRef<string | null>(null);
+  const startedKeysRef = useRef<Set<string>>(new Set());
+  const placedGuessKeysRef = useRef<Set<string>>(new Set());
+  const submittedKeysRef = useRef<Set<string>>(new Set());
 
   const dailyPothole = useMemo(() => getDailyPothole(), []);
   const todaysPothole = activePothole || dailyPothole;
+  const isPastPlay = activePothole !== null;
+  const potholeTrackingKey = `${todaysPothole.id}:${todaysPothole.date}:${isPastPlay ? "past" : "daily"}`;
 
   // Determine daily pothole number
   const dayNumber = useMemo(() => {
@@ -42,6 +49,92 @@ export default function GameContainer() {
     window.addEventListener("play-past-pothole", handlePlayPast);
     return () => window.removeEventListener("play-past-pothole", handlePlayPast);
   }, [handlePlayPast]);
+
+  useEffect(() => {
+    visitorIdRef.current = getOrCreateVisitorId();
+
+    void trackVisitorEvent({
+      event: "visited",
+      visitorId: visitorIdRef.current,
+      potholeId: todaysPothole.id,
+      potholeDate: todaysPothole.date,
+      isPastPlay,
+    });
+  }, [todaysPothole.id, todaysPothole.date, isPastPlay]);
+
+  useEffect(() => {
+    if (phase !== "PLAYING" || startedKeysRef.current.has(potholeTrackingKey)) {
+      return;
+    }
+
+    const visitorId = visitorIdRef.current || getOrCreateVisitorId();
+    visitorIdRef.current = visitorId;
+    startedKeysRef.current.add(potholeTrackingKey);
+
+    void trackVisitorEvent({
+      event: "started_game",
+      visitorId,
+      potholeId: todaysPothole.id,
+      potholeDate: todaysPothole.date,
+      isPastPlay,
+    });
+  }, [phase, potholeTrackingKey, todaysPothole.id, todaysPothole.date, isPastPlay]);
+
+  useEffect(() => {
+    if (!guessPos || placedGuessKeysRef.current.has(potholeTrackingKey)) {
+      return;
+    }
+
+    const visitorId = visitorIdRef.current || getOrCreateVisitorId();
+    visitorIdRef.current = visitorId;
+    placedGuessKeysRef.current.add(potholeTrackingKey);
+
+    void trackVisitorEvent({
+      event: "placed_guess_pin",
+      visitorId,
+      potholeId: todaysPothole.id,
+      potholeDate: todaysPothole.date,
+      isPastPlay,
+      guessLat: guessPos[0],
+      guessLng: guessPos[1],
+    });
+  }, [guessPos, potholeTrackingKey, todaysPothole.id, todaysPothole.date, isPastPlay]);
+
+  useEffect(() => {
+    if (
+      phase !== "SCORED" ||
+      score === null ||
+      distance === null ||
+      submittedKeysRef.current.has(potholeTrackingKey)
+    ) {
+      return;
+    }
+
+    const visitorId = visitorIdRef.current || getOrCreateVisitorId();
+    visitorIdRef.current = visitorId;
+    submittedKeysRef.current.add(potholeTrackingKey);
+
+    void trackVisitorEvent({
+      event: "submitted_guess",
+      visitorId,
+      potholeId: todaysPothole.id,
+      potholeDate: todaysPothole.date,
+      isPastPlay,
+      score,
+      distanceMiles: distance,
+      guessLat: guessPos?.[0],
+      guessLng: guessPos?.[1],
+    });
+  }, [
+    phase,
+    score,
+    distance,
+    guessPos,
+    potholeTrackingKey,
+    todaysPothole.id,
+    todaysPothole.date,
+    isPastPlay,
+  ]);
 
   function handleGuess() {
     if (!guessPos) return;
@@ -68,8 +161,6 @@ export default function GameContainer() {
     setDistance(null);
     setPhase("PLAYING");
   }
-
-  const isPastPlay = activePothole !== null;
 
   const contextValue = {
     phase,

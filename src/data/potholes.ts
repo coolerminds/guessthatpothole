@@ -30,7 +30,7 @@ export const potholes: Pothole[] = [
   },
   {
     id: "pot3",
-    image: "/potholes/pot1.png",
+    image: "/potholes/pot3.png",
     lat: 36.7621,
     lng: -119.8234,
     hint: "West of Highway 99",
@@ -38,7 +38,7 @@ export const potholes: Pothole[] = [
   },
   {
     id: "pot4",
-    image: "/potholes/pot2.jpg",
+    image: "/potholes/pot4.jpg",
     lat: 36.6943,
     lng: -119.7512,
     hint: "South Fresno",
@@ -46,7 +46,7 @@ export const potholes: Pothole[] = [
   },
   {
     id: "pot5",
-    image: "/potholes/pot1.png",
+    image: "/potholes/pot5.png",
     lat: 36.7834,
     lng: -119.6897,
     hint: "Near Woodward Park",
@@ -62,7 +62,7 @@ export const potholes: Pothole[] = [
   },
   {
     id: "pot7",
-    image: "/potholes/pot1.png",
+    image: "/potholes/pot3.png",
     lat: 36.8312,
     lng: -119.7621,
     hint: "Near Fresno State",
@@ -70,7 +70,7 @@ export const potholes: Pothole[] = [
   },
   {
     id: "pot8",
-    image: "/potholes/pot2.jpg",
+    image: "/potholes/pot4.jpg",
     lat: 36.7189,
     lng: -119.8103,
     hint: "Near Roeding Park",
@@ -78,7 +78,7 @@ export const potholes: Pothole[] = [
   },
   {
     id: "pot9",
-    image: "/potholes/pot1.png",
+    image: "/potholes/pot5.png",
     lat: 36.7741,
     lng: -119.7342,
     hint: "East of Highway 41",
