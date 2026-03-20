@@ -128,7 +128,7 @@ export default function Leaderboard() {
       className="leaderboard"
     >
       <h2 className="leaderboard__title">
-        <i className="fa-solid fa-trophy"></i> Hall of Champions
+        <i className="fa-solid fa-trophy"></i> Today's Hall of Champions
       </h2>
       <div className="leaderboard__pothole-date">
         <i className="fa-solid fa-calendar"></i> {potholeDate}

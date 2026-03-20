@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import GameContext, { GamePhase } from "./GameContext";
 import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
-import { getFresnoDayOfYear } from "@/lib/date";
+import { getFresnoDisplayDate } from "@/lib/date";
 import { getOrCreateVisitorId, getVisitorId, trackVisitorEvent } from "@/lib/visitorClient";
 import PotholeViewer from "./PotholeViewer";
 import ScoreDisplay from "./ScoreDisplay";
@@ -29,9 +29,8 @@ export default function GameContainer() {
   const isPastPlay = activePothole !== null;
   const potholeTrackingKey = `${todaysPothole.id}:${todaysPothole.date}:${isPastPlay ? "past" : "daily"}`;
 
-  // Determine daily pothole number
-  const dayNumber = useMemo(() => {
-    return getFresnoDayOfYear();
+  const dailyLabel = useMemo(() => {
+    return getFresnoDisplayDate();
   }, []);
 
   // Listen for past pothole play events
@@ -198,7 +197,7 @@ export default function GameContainer() {
             </h1>
           </div>
           <div className="game__daily-badge">
-            <i className="fa-solid fa-calendar-day"></i> Pothole of the Day #{dayNumber}
+            <i className="fa-solid fa-calendar-day"></i>The Pothole for {dailyLabel}
           </div>
         </header>
 
@@ -214,15 +213,26 @@ export default function GameContainer() {
                 exit={{ opacity: 0 }}
                 className="game__intro"
               >
+                <div className="game__intro-preview" aria-hidden="true">
+                  <div className="game__intro-preview-bar">
+                    <i className="fa-solid fa-circle-info"></i>
+                    Preview today&apos;s pothole challenge
+                  </div>
+                  <div className="game__playing-split">
+                    <PotholeViewer />
+                    <FresnoMap />
+                  </div>
+                </div>
+                <div className="game__intro-overlay" />
                 <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
+                  initial={{ y: 30, opacity: 0, scale: 0.96 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.18, duration: 0.45 }}
                   className="game__intro-card"
                 >
-                  <div className="game__intro-emoji">🕳️🚗💥</div>
+                  
                   <h2 className="game__intro-heading">
-                    Guess That Pothole!
+                    Guess That Pothole
                   </h2>
                   {isReturningVisitor && (
                     <div className="game__intro-welcome">
@@ -230,25 +240,26 @@ export default function GameContainer() {
                       <span>Welcome back. Ready for another pothole hunt?</span>
                     </div>
                   )}
-                  <p className="game__intro-subheading">Pothole of the Day</p>
+                  <p className="game__intro-subheading">How To Play ??</p>
                   <p className="game__intro-desc">
                     You&apos;ll be shown a photo of a real pothole from{" "}
                     <strong>Fresno, California</strong>. Click on the map where
-                    you think it is. The closer your guess, the higher your score!
+                    you think it is. The closer your guess, the higher your score! Every day there will be a new pothole to find. Its as easy as ONE... TWO... THREE....
                   </p>
                   <div className="game__intro-rules">
                     <div className="game__intro-rule">
                       <i className="fa-solid fa-image"></i>
-                      <span>See the pothole photo</span>
+                      <span>1) See the pothole photo</span>
                     </div>
                     <div className="game__intro-rule">
                       <i className="fa-solid fa-map-pin"></i>
-                      <span>Click the map to guess</span>
+                      <span>2) Click the map to guess</span>
                     </div>
                     <div className="game__intro-rule">
                       <i className="fa-solid fa-star"></i>
-                      <span>Score up to 5,000 points</span>
+                      <span>3) See your score based on distance from the Pothole!</span>
                     </div>
+                    Ready?
                   </div>
                   <div className="game__intro-actions">
                     <motion.button

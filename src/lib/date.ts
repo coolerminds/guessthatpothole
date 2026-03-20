@@ -28,3 +28,11 @@ export function getFresnoDayOfYear(date: Date = new Date()): number {
 
   return Math.floor((currentDay - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
 }
+
+export function getFresnoDisplayDate(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: FRESNO_TIME_ZONE,
+    month: "numeric",
+    day: "numeric",
+  }).format(date);
+}

@@ -132,19 +132,62 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.game__intro-preview {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  filter: blur(7px) saturate(0.72) brightness(0.62);
+  transform: scale(1.04);
+  transform-origin: center;
+}
+
+.game__intro-preview-bar {
+  background: rgba(74, 54, 36, 0.82);
+  border-bottom: 1px solid rgba(224, 194, 144, 0.18);
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--gold-light);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.game__intro-overlay {
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(circle at 50% 40%, rgba(192, 162, 96, 0.06) 0%, transparent 60%);
+    linear-gradient(180deg, rgba(20, 12, 7, 0.42) 0%, rgba(33, 21, 14, 0.68) 100%),
+    radial-gradient(circle at 50% 35%, rgba(154, 110, 64, 0.24) 0%, transparent 55%),
+    rgba(46, 28, 16, 0.38);
+  z-index: 0;
 }
 
 .game__intro-card {
-  background: var(--dark-card);
-  border: var(--border-gold);
-  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(37, 32, 25, 0.95) 0%, rgba(29, 24, 18, 0.94) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(224, 194, 144, 0.55);
+  border-radius: 14px;
   padding: 44px 40px;
-  max-width: 520px;
+  max-width: 560px;
+  width: min(560px, 100%);
   text-align: center;
-  box-shadow: var(--glow-gold), 0 16px 50px rgba(0,0,0,0.6);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.52),
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    var(--glow-gold);
   position: relative;
+  z-index: 1;
 }
 
 .game__intro-card::before {
@@ -1105,8 +1148,18 @@ body {
   .game__header { padding: 8px 14px; }
   .game__title { font-size: 1rem; }
   .game__daily-badge { font-size: 0.68rem; padding: 3px 10px; }
+  .game__intro { padding: 18px; }
+  .game__intro-preview {
+    transform: scale(1.02);
+    filter: blur(5px) saturate(0.72) brightness(0.58);
+  }
+  .game__intro-preview-bar { font-size: 0.76rem; padding: 8px 12px; }
   .game__intro-card { padding: 24px 18px; }
   .game__intro-heading { font-size: 1.4rem; }
+  .game__intro-secondary-btn {
+    width: 100%;
+    min-width: 0;
+  }
   .score-display__score { font-size: 2.6rem; }
   .score-display__label { font-size: 1.3rem; }
   .leaderboard { padding: 18px 14px; }
