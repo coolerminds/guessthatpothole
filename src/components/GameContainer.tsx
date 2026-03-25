@@ -231,7 +231,13 @@ export default function GameContainer() {
                 exit={{ opacity: 0 }}
                 className="game__intro"
               >
-                <div className="game__intro-inner">
+                <div
+                  className={`game__intro-inner ${
+                    isReturningVisitor
+                      ? "game__intro-inner--returning"
+                      : "game__intro-inner--new"
+                  }`}
+                >
                   {isReturningVisitor && (
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
