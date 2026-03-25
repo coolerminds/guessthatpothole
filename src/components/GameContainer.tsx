@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import GameContext, { GamePhase } from "./GameContext";
 import { Pothole, getDailyPothole, getDistanceMiles, calculateScore } from "@/data/potholes";
 import { getFresnoDisplayDate } from "@/lib/date";
@@ -190,14 +191,31 @@ export default function GameContainer() {
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               className="game__logo-icon"
             >
-              🕳️
+              <i className="fa-solid fa-crown"></i>
             </motion.span>
             <h1 className="game__title">
               GUESS THAT <span className="game__title--accent">POTHOLE</span>
             </h1>
           </div>
-          <div className="game__daily-badge">
-            <i className="fa-solid fa-calendar-day"></i>The Pothole for {dailyLabel}
+          <div className="game__nav">
+            <button
+              type="button"
+              onClick={goToLeaderboard}
+              className={`game__nav-button ${
+                phase === "LEADERBOARD" ? "game__nav-button--active" : ""
+              }`}
+            >
+              View Scoreboard
+            </button>
+            <Link href="/history" className="game__nav-link">
+              My History
+            </Link>
+          </div>
+          <div className="game__header-actions">
+            <div className="game__score-pill">Score: {(score ?? 0).toLocaleString()}</div>
+            <div className="game__daily-badge">
+              <i className="fa-solid fa-calendar-day"></i>The Pothole for {dailyLabel}
+            </div>
           </div>
         </header>
 
@@ -213,75 +231,118 @@ export default function GameContainer() {
                 exit={{ opacity: 0 }}
                 className="game__intro"
               >
-                <div className="game__intro-preview" aria-hidden="true">
-                  <div className="game__intro-preview-bar">
-                    <i className="fa-solid fa-circle-info"></i>
-                    Preview today&apos;s pothole challenge
-                  </div>
-                  <div className="game__playing-split">
-                    <PotholeViewer />
-                    <FresnoMap />
-                  </div>
-                </div>
-                <div className="game__intro-overlay" />
-                <motion.div
-                  initial={{ y: 30, opacity: 0, scale: 0.96 }}
-                  animate={{ y: 0, opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.18, duration: 0.45 }}
-                  className="game__intro-card"
-                >
-                  
-                  <h2 className="game__intro-heading">
-                    Guess That Pothole
-                  </h2>
+                <div className="game__intro-inner">
                   {isReturningVisitor && (
-                    <div className="game__intro-welcome">
-                      <i className="fa-solid fa-road"></i>
-                      <span>Welcome back. Ready for another pothole hunt?</span>
-                    </div>
+                    <motion.div
+                      initial={{ y: -10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.08, duration: 0.35 }}
+                      className="game__intro-welcome"
+                    >
+                      <i className="fa-solid fa-sparkles"></i>
+                      <div>
+                        <span className="game__intro-welcome-label">
+                          Royal Recognition
+                        </span>
+                        <span className="game__intro-welcome-text">
+                          Welcome back. Ready for another pothole hunt?
+                        </span>
+                      </div>
+                    </motion.div>
                   )}
-                  <p className="game__intro-subheading">How To Play ??</p>
-                  <p className="game__intro-desc">
-                    You&apos;ll be shown a photo of a real pothole from{" "}
-                    <strong>Fresno, California</strong>. Click on the map where
-                    you think it is. The closer your guess, the higher your score! Every day there will be a new pothole to find. Its as easy as ONE... TWO... THREE....
-                  </p>
-                  <div className="game__intro-rules">
-                    <div className="game__intro-rule">
-                      <i className="fa-solid fa-image"></i>
-                      <span>1) See the pothole photo</span>
+
+                  <motion.section
+                    initial={{ y: 30, opacity: 0, scale: 0.98 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.16, duration: 0.45 }}
+                    className="game__intro-hero"
+                  >
+                    <p className="game__intro-subheading">
+                      Presenting the Tournament of
+                    </p>
+                    <h2 className="game__intro-heading">
+                      Guess That
+                      <br />
+                      Pothole
+                    </h2>
+                    <p className="game__intro-desc">
+                      You&apos;ll be shown a photo of a real pothole from{" "}
+                      <strong>Fresno, California</strong>. Click on the map where
+                      you think it is. The closer your guess, the higher your
+                      score. Every day there will be a new pothole to find.
+                    </p>
+                    <div className="game__intro-actions">
+                      <motion.button
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setPhase("PLAYING")}
+                        className="game__play-btn"
+                      >
+                        <span>Lets Play</span>
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={goToLeaderboard}
+                        className="game__intro-secondary-btn"
+                      >
+                        <span>View Scoreboard</span>
+                      </motion.button>
                     </div>
-                    <div className="game__intro-rule">
-                      <i className="fa-solid fa-map-pin"></i>
-                      <span>2) Click the map to guess</span>
+                  </motion.section>
+
+                  <section className="game__intro-rules">
+                    <article className="game__intro-rule">
+                      <div className="game__intro-rule-seal">
+                        <i className="fa-solid fa-image"></i>
+                      </div>
+                      <span className="game__intro-rule-number">01</span>
+                      <h3 className="game__intro-rule-title">See the pothole photo</h3>
+                    </article>
+                    <article className="game__intro-rule">
+                      <div className="game__intro-rule-seal">
+                        <i className="fa-solid fa-map-pin"></i>
+                      </div>
+                      <span className="game__intro-rule-number">02</span>
+                      <h3 className="game__intro-rule-title">Click the map to guess</h3>
+                    </article>
+                    <article className="game__intro-rule">
+                      <div className="game__intro-rule-seal">
+                        <i className="fa-solid fa-star"></i>
+                      </div>
+                      <span className="game__intro-rule-number">03</span>
+                      <h3 className="game__intro-rule-title">
+                        See your score based on distance from the Pothole!
+                      </h3>
+                    </article>
+                  </section>
+
+                  <section className="game__intro-stage">
+                    <div className="game__intro-stage-frame">
+                      <div className="game__playing-split game__intro-stage-split">
+                        <PotholeViewer />
+                        <FresnoMap />
+                      </div>
+                      <div className="game__intro-stage-overlay">
+                        <div className="game__intro-stage-card">
+                          <div className="game__intro-stage-icon">
+                            <i className="fa-solid fa-compass"></i>
+                          </div>
+                          <h3 className="game__intro-stage-title">
+                            Preview Today&apos;s Challenge
+                          </h3>
+                          <p className="game__intro-stage-desc">
+                            Study the pothole. Search the city map. Lock in your
+                            guess when you&apos;re ready.
+                          </p>
+                          <span className="game__intro-stage-status">
+                            Ready when you are
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="game__intro-rule">
-                      <i className="fa-solid fa-star"></i>
-                      <span>3) See your score based on distance from the Pothole!</span>
-                    </div>
-                    Ready?
-                  </div>
-                  <div className="game__intro-actions">
-                    <motion.button
-                      whileHover={{ scale: 1.08 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setPhase("PLAYING")}
-                      className="game__play-btn"
-                    >
-                      <span>Lets Play</span>
-                      <i className="fa-solid fa-arrow-right"></i>
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={goToLeaderboard}
-                      className="game__intro-secondary-btn"
-                    >
-                      <i className="fa-solid fa-trophy"></i>
-                      <span>VIEW SCOREBOARD</span>
-                    </motion.button>
-                  </div>
-                </motion.div>
+                  </section>
+                </div>
               </motion.div>
             )}
 
@@ -347,28 +408,29 @@ export default function GameContainer() {
               >
                 <Leaderboard />
 
-                {/* Past Potholes */}
-                <PastPotholes />
+                <div className="game__leaderboard-lower">
+                  <PastPotholes />
 
-                {/* Submit Pothole — Coming Soon */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="game__submit-pothole"
-                >
-                  <div className="game__submit-pothole-badge">COMING SOON</div>
-                  <h3 className="game__submit-pothole-title">
-                    <i className="fa-solid fa-camera"></i> Know a Pothole?
-                  </h3>
-                  <p className="game__submit-pothole-desc">
-                    Soon you&apos;ll be able to submit your own pothole photos and
-                    coordinates to be featured as a Pothole of the Day
-                  </p>
-                  <button className="game__submit-pothole-btn" disabled>
-                    <i className="fa-solid fa-upload"></i> Submit a Pothole
-                  </button>
-                </motion.div>
+                  {/* Submit Pothole — Coming Soon */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="game__submit-pothole"
+                  >
+                    <div className="game__submit-pothole-badge">COMING SOON</div>
+                    <h3 className="game__submit-pothole-title">
+                      <i className="fa-solid fa-camera"></i> Know a Pothole?
+                    </h3>
+                    <p className="game__submit-pothole-desc">
+                      Soon you&apos;ll be able to submit your own pothole photos
+                      and coordinates to be featured as a Pothole of the Day
+                    </p>
+                    <button className="game__submit-pothole-btn" disabled>
+                      <i className="fa-solid fa-upload"></i> Submit a Pothole
+                    </button>
+                  </motion.div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
